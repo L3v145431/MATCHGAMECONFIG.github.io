@@ -14,22 +14,27 @@
             background-color: #FFFFFF;
             margin: 0;
             padding: 20px;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
+
         h1 {
             color: #FFBC00;
             margin-bottom: 20px;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
+
         .settings-container {
             background-color: #E2E2E2;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 350px;
+            width: 100%;
+            max-width: 500px;
         }
+
         label {
             display: block;
             margin-bottom: 10px;
@@ -37,15 +42,17 @@
             font-size: 1.2em;
             color: #000000;
         }
+
         input[type="color"] {
-            width: 100px;
-            height: 100px;
+            width: 100%;
+            height: 50px;
             padding: 0;
             margin-bottom: 20px;
             border: 2px solid #000000;
             border-radius: 10px;
             cursor: pointer;
         }
+
         input[type="text"], input[type="number"] {
             width: 100%;
             padding: 10px;
@@ -53,7 +60,9 @@
             border: 1px solid #000000;
             border-radius: 4px;
             font-size: 1.1em;
+            box-sizing: border-box;
         }
+
         input[type="file"] {
             width: 100%;
             padding: 10px;
@@ -61,7 +70,9 @@
             border: 1px solid #000000;
             border-radius: 4px;
             font-size: 1.1em;
+            box-sizing: border-box;
         }
+
         button {
             background-color: #FCD307;
             border: none;
@@ -75,18 +86,30 @@
             cursor: pointer;
             border-radius: 8px;
             width: 100%;
+            box-sizing: border-box;
         }
+
         .image-preview {
             width: 50px;
             height: 50px;
             object-fit: cover;
             margin-top: 10px;
         }
+
         .delete-button {
             background-color: #FF6B6B;
             width: auto;
             padding: 8px 16px;
             margin-left: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group input[type="text"] {
+            flex: 1;
         }
     </style>
 </head>
@@ -96,8 +119,10 @@
         <form id="settings-form">
             <label for="background-color">Color de Fondo:</label>
             <input type="color" id="background-color" name="background-color" value="#FFFFFF">
+
             <label for="num-squares">Número de Cuadros:</label>
             <input type="number" id="num-squares" name="num-squares" min="1" value="3">
+
             <div id="image-settings">
                 <!-- Las configuraciones de imágenes y texto se añadirán aquí dinámicamente -->
             </div>
@@ -148,9 +173,14 @@
                 imageSettingsDiv.appendChild(labelImage);
                 imageSettingsDiv.appendChild(inputImage);
                 imageSettingsDiv.appendChild(preview);
-                imageSettingsDiv.appendChild(labelText);
-                imageSettingsDiv.appendChild(inputText);
-                imageSettingsDiv.appendChild(deleteButton);
+
+                const textGroup = document.createElement('div');
+                textGroup.className = 'input-group';
+                textGroup.appendChild(labelText);
+                textGroup.appendChild(inputText);
+                textGroup.appendChild(deleteButton);
+
+                imageSettingsDiv.appendChild(textGroup);
 
                 inputImage.addEventListener('change', function(event) {
                     const file = event.target.files[0];
