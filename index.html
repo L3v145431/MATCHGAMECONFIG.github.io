@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración del Juego</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #FFFFFF;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            color: #FFBC00;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .settings-container {
+            background-color: #E2E2E2;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 350px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #000000;
+        }
+        input[type="color"] {
+            width: 100px;
+            height: 100px;
+            padding: 0;
+            margin-bottom: 20px;
+            border: 2px solid #000000;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+        button {
+            background-color: #FCD307;
+            border: none;
+            color: #000000;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.2em;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .image-preview {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-top: 10px;
+        }
+        .delete-button {
+            background-color: #FF6B6B;
+            width: auto;
+            padding: 8px 16px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Configuración del Juego</h1>
+    <div class="settings-container">
+        <form id="settings-form">
+            <label for="background-color">Color de Fondo:</label>
+            <input type="color" id="background-color" name="background-color" value="#FFFFFF">
+            <label for="num-squares">Número de Cuadros:</label>
+            <input type="number" id="num-squares" name="num-squares" min="1" value="3">
+            <div id="image-settings">
+                <!-- Las configuraciones de imágenes y texto se añadirán aquí dinámicamente -->
+            </div>
+            <button type="button" onclick="saveSettings()">Guardar Configuración</button>
+        </form>
+    </div>
+    <script>
+        function loadImageSettings(numSquares) {
+            const imageSettingsDiv = document.getElementById('image-settings');
+            imageSettingsDiv.innerHTML = '';
+            for (let i = 1; i <= numSquares; i++) {
+                const savedImage = localStorage.getItem(`image${i}`);
+                const savedText = localStorage.getItem(`text${i}`) || '';
+
+                const labelImage = document.createElement('label');
+                labelImage.textContent = `Imagen ${i}:`;
+                labelImage.htmlFor = `image${i}`;
+
+                const inputImage = document.createElement('input');
+                inputImage.type = 'file';
+                inputImage.id = `image${i}`;
+                inputImage.name = `image${i}`;
+                inputImage.accept = 'image/*';
+
+                const preview = document.createElement('img');
+                preview.id = `preview${i}`;
+                preview.className = 'image-preview';
+                if (savedImage) {
+                    preview.src = savedImage;
+                }
+
+                const labelText = document.createElement('label');
+                labelText.textContent = `Texto ${i}:`;
+                labelText.htmlFor = `text${i}`;
+
+                const inputText = document.createElement('input');
+                inputText.type = 'text';
+                inputText.id = `text${i}`;
+                inputText.name = `text${i}`;
+                inputText.value = savedText;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.className = 'delete-button';
+                deleteButton.onclick = function() { deleteSquare(i); };
+
+                imageSettingsDiv.appendChild(labelImage);
+                imageSettingsDiv.appendChild(inputImage);
+                imageSettingsDiv.appendChild(preview);
+                imageSettingsDiv.appendChild(labelText);
+                imageSettingsDiv.appendChild(inputText);
+                imageSettingsDiv.appendChild(deleteButton);
+
+                inputImage.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+
+        function deleteSquare(index) {
+            localStorage.removeItem(`image${index}`);
+            localStorage.removeItem(`text${index}`);
+            loadImageSettings(document.getElementById('num-squares').value);
+        }
+
+        function saveSettings() {
+            const bgColor = document.getElementById('background-color').value;
+            const numSquares = document.getElementById('num-squares').value;
+            localStorage.setItem('bgColor', bgColor);
+            localStorage.setItem('numSquares', numSquares);
+            for (let i = 1; i <= numSquares; i++) {
+                const preview = document.getElementById(`preview${i}`);
+                if (preview && preview.src) {
+                    localStorage.setItem(`image${i}`, preview.src);
+                }
+                const textInput = document.getElementById(`text${i}`);
+                if (textInput) {
+                    localStorage.setItem(`text${i}`, textInput.value);
+                }
+            }
+            alert('Configuración guardada!');
+        }
+
+        window.onload = function() {
+            const savedBgColor = localStorage.getItem('bgColor');
+            const savedNumSquares = localStorage.getItem('numSquares') || 3;
+            if (savedBgColor) {
+                document.getElementById('background-color').value = savedBgColor;
+            }
+            document.getElementById('num-squares').value = savedNumSquares;
+            loadImageSettings(savedNumSquares);
+        };
+
+        document.getElementById('num-squares').addEventListener('change', function() {
+            const numSquares = this.value;
+            loadImageSettings(numSquares);
+        });
+    </script>
+</body>
+</html>
